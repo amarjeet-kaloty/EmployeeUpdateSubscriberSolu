@@ -12,8 +12,8 @@ namespace EmployeeUpdateSubscriber.Messaging
         private readonly ILogger<EmployeeUpdateEventConsumer> _logger;
         private readonly IConnectionFactory _connectionFactory;
         private IConnection _connection;
-        private const string EXCHANGE_NAME = "rabbitmq-pubsub";
-        private const string TOPIC_NAME = "employee-updated-topic";
+        private const string EXCHANGE_NAME = "employee-data-changes";
+        private const string UPDATED_TOPIC_NAME = "employee-updated-topic";
 
         public EmployeeUpdateEventConsumer(ILogger<EmployeeUpdateEventConsumer> logger, IConnectionFactory connectionFactory)
         {
@@ -30,8 +30,8 @@ namespace EmployeeUpdateSubscriber.Messaging
                 await channel.ExchangeDeclareAsync(exchange: EXCHANGE_NAME, type: ExchangeType.Topic);
                 var queueDeclareResult = await channel.QueueDeclareAsync().ConfigureAwait(false);
                 string actualQueueName = queueDeclareResult.QueueName;
-                await channel.QueueBindAsync(queue: actualQueueName, exchange: EXCHANGE_NAME, routingKey: TOPIC_NAME);
-                _logger.LogInformation($" [=>] Bound queue '{actualQueueName}' to exchange '{EXCHANGE_NAME}' with routing key '{TOPIC_NAME}'.");
+                await channel.QueueBindAsync(queue: actualQueueName, exchange: EXCHANGE_NAME, routingKey: UPDATED_TOPIC_NAME);
+                _logger.LogInformation($" [=>] Bound queue '{actualQueueName}' to exchange '{EXCHANGE_NAME}' with routing key '{UPDATED_TOPIC_NAME}'.");
                 _logger.LogInformation(" [***] Waiting for messages...");
 
                 var consumer = new AsyncEventingBasicConsumer(channel);
